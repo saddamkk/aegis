@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (toggled by ThemeProvider), falling back to the
+   user's OS preference on first load — see src/theme/ThemeProvider.tsx. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Brand */
+  --aegis-navy: #142259;
+  --aegis-navy-mid: #1e3280;
+  --aegis-navy-tint: #eef2ff;
+  --aegis-accent-blue: #2563eb;
+
+  /* Surfaces & text — light theme defaults */
+  --aegis-canvas: #f4f6fb;
+  --aegis-surface: #ffffff;
+  --aegis-surface-2: #f7f9fc;
+  --aegis-border: #e3e7ef;
+  --aegis-text-1: #0d1526;
+  --aegis-text-2: #4a5270;
+  --aegis-text-3: #96a0bb;
+  --aegis-accent: #142259;
+  --aegis-accent-tint: #eef2ff;
+  --aegis-danger-border: #fecaca;
+
+  /* Classification status — fixed color, light tint */
+  --aegis-action-color: #dc2626;
+  --aegis-action-bg: #fef2f2;
+  --aegis-blocker-color: #ea580c;
+  --aegis-blocker-bg: #fff7ed;
+  --aegis-decision-color: #1d4ed8;
+  --aegis-decision-bg: #eff6ff;
+  --aegis-risk-color: #d97706;
+  --aegis-risk-bg: #fffbeb;
+  --aegis-fyi-color: #9ca3af;
+  --aegis-fyi-bg: #f3f4f6;
+  --aegis-approved-color: #059669;
+  --aegis-approved-bg: #ecfdf5;
+  --aegis-pending-color: #2563eb;
+  --aegis-pending-bg: #eff4ff;
+  --aegis-neutral-color: #d1d5db;
+  --aegis-neutral-bg: #f9fafb;
+  /* "Sent" status pill — muted text-3 on a neutral surface tint */
+  --aegis-sent-bg: #f3f4f6;
+
+  /* Spacing scale */
+  --aegis-space-xs: 4px;
+  --aegis-space-sm: 8px;
+  --aegis-space-md: 12px;
+  --aegis-space-lg: 16px;
+  --aegis-space-xl: 20px;
+  --aegis-space-2xl: 28px;
+  --aegis-space-3xl: 48px;
+
+  /* Radius scale */
+  --aegis-radius-xs: 4px;
+  --aegis-radius-sm: 6px;
+  --aegis-radius-md: 8px;
+  --aegis-radius-lg: 10px;
+  --aegis-radius-xl: 13px;
+  --aegis-radius-pill: 100px;
+
+  /* Motion timing */
+  --aegis-motion-micro: 80ms;
+  --aegis-motion-quick: 150ms;
+  --aegis-motion-standard: 200ms;
+  --aegis-motion-deliberate: 300ms;
+  --aegis-motion-slow: 500ms;
+
+  --background: var(--aegis-canvas);
+  --foreground: var(--aegis-text-1);
+}
+
+.dark {
+  --aegis-canvas: #0e1117;
+  --aegis-surface: #161b27;
+  --aegis-surface-2: #1c2333;
+  --aegis-border: rgba(255, 255, 255, 0.07);
+  --aegis-text-1: #f0f2f8;
+  --aegis-text-2: #8b92ad;
+  --aegis-text-3: #4e5470;
+  --aegis-accent: #4b7bf5;
+  --aegis-accent-tint: rgba(75, 123, 245, 0.14);
+  --aegis-danger-border: rgba(220, 38, 38, 0.42);
+
+  --aegis-action-bg: rgba(220, 38, 38, 0.16);
+  --aegis-blocker-bg: rgba(234, 88, 12, 0.16);
+  --aegis-decision-bg: rgba(29, 78, 216, 0.18);
+  --aegis-risk-bg: rgba(217, 119, 6, 0.16);
+  --aegis-fyi-bg: rgba(156, 163, 175, 0.16);
+  --aegis-approved-bg: rgba(5, 150, 105, 0.18);
+  --aegis-pending-color: #7aa2ff;
+  --aegis-pending-bg: rgba(37, 99, 235, 0.16);
+  --aegis-neutral-bg: rgba(255, 255, 255, 0.06);
+  --aegis-sent-bg: rgba(255, 255, 255, 0.06);
+}
+
+@theme inline {
+  --color-canvas: var(--aegis-canvas);
+  --color-surface: var(--aegis-surface);
+  --color-surface-2: var(--aegis-surface-2);
+  --color-border: var(--aegis-border);
+  --color-text-1: var(--aegis-text-1);
+  --color-text-2: var(--aegis-text-2);
+  --color-text-3: var(--aegis-text-3);
+  --color-accent: var(--aegis-accent);
+  --color-accent-tint: var(--aegis-accent-tint);
+  --color-navy: var(--aegis-navy);
+  --color-navy-mid: var(--aegis-navy-mid);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", Consolas, monospace;
+
+  --spacing-aegis-xs: var(--aegis-space-xs);
+  --spacing-aegis-sm: var(--aegis-space-sm);
+  --spacing-aegis-md: var(--aegis-space-md);
+  --spacing-aegis-lg: var(--aegis-space-lg);
+  --spacing-aegis-xl: var(--aegis-space-xl);
+  --spacing-aegis-2xl: var(--aegis-space-2xl);
+  --spacing-aegis-3xl: var(--aegis-space-3xl);
+
+  --radius-aegis-xs: var(--aegis-radius-xs);
+  --radius-aegis-sm: var(--aegis-radius-sm);
+  --radius-aegis-md: var(--aegis-radius-md);
+  --radius-aegis-lg: var(--aegis-radius-lg);
+  --radius-aegis-xl: var(--aegis-radius-xl);
+  --radius-aegis-pill: var(--aegis-radius-pill);
+}
+
+@keyframes aegisStream {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes aegisPulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5); }
+  100% { box-shadow: 0 0 0 16px rgba(37, 99, 235, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background: var(--aegis-canvas);
+  color: var(--aegis-text-1);
+  font-family: var(--font-sans);
+  transition: background var(--aegis-motion-standard) ease, color var(--aegis-motion-standard) ease;
+}
