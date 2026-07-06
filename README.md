@@ -39,13 +39,17 @@ demo/smoke-test harness showing each component, not a styleguide.
 `/login` is a single page with a Log in / Sign up tab switcher, styled with
 the AEGIS components above. It's wired to real (if minimal) auth:
 
-- `src/lib/auth/users.ts` — file-backed user store (`data/users.json`,
-  gitignored) with bcrypt-hashed passwords. No external database — swap
-  this module for a real one before this matters for concurrent-write
-  traffic (no file locking).
+- `src/lib/db.ts` — lazy Postgres client (`postgres` package), pointed at
+  `DATABASE_URL`. Works against any Postgres — set up and tested against
+  Supabase.
+- `db/migrations/001_users.sql` — creates the `users` table. Run it once
+  against your database (Supabase SQL editor, or `psql "$DATABASE_URL" -f
+  db/migrations/001_users.sql`) before signup will work.
+- `src/lib/auth/users.ts` — bcrypt-hashed passwords, queried via the above.
 - `src/lib/auth/session.ts` — `iron-session`-backed encrypted cookie
   session. Requires a `SESSION_SECRET` env var (32+ random chars) — see
-  `.env.example`.
+  `.env.example`. Validated lazily on first request, not at import time,
+  so a missing env var doesn't crash the Next.js build.
 - `src/app/api/auth/{signup,login,logout,session}/route.ts` — API routes.
 - `/dashboard` — a minimal protected page (server-side redirect to
   `/login` if unauthenticated) demonstrating the gated destination.
@@ -53,8 +57,12 @@ the AEGIS components above. It's wired to real (if minimal) auth:
 ## Development
 
 ```bash
-cp .env.example .env.local   # fill in SESSION_SECRET
+cp .env.example .env.local   # fill in SESSION_SECRET and DATABASE_URL
 npm run dev      # http://localhost:3000
 npm run build
 npm run lint
 ```
+
+On Vercel, set `SESSION_SECRET` and `DATABASE_URL` as project environment
+variables (Settings → Environment Variables) — the build succeeds without
+them, but auth routes need them at runtime.

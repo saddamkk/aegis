@@ -37,9 +37,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# local user store (file-backed auth — see src/lib/auth/users.ts)
-/data/
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
