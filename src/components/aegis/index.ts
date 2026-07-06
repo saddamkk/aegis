@@ -7,6 +7,9 @@ export type { ButtonProps, ButtonVariant } from './Button';
 export { StatCard } from './StatCard';
 export type { StatCardProps } from './StatCard';
 
+export { Input } from './Input';
+export type { InputProps } from './Input';
+
 export { PipelineBar } from './PipelineBar';
 export type { PipelineBarProps, PipelineStep, PipelineStepState } from './PipelineBar';
 

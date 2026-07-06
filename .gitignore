@@ -32,9 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# local user store (file-backed auth — see src/lib/auth/users.ts)
+/data/
 
 # typescript
 *.tsbuildinfo
