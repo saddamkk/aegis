@@ -39,12 +39,15 @@ demo/smoke-test harness showing each component, not a styleguide.
 `/login` is a single page with a Log in / Sign up tab switcher, styled with
 the AEGIS components above. It's wired to real (if minimal) auth:
 
-- `src/lib/db.ts` — lazy Postgres client (`postgres` package), pointed at
-  `DATABASE_URL`. Works against any Postgres — set up and tested against
-  Supabase.
-- `db/migrations/001_users.sql` — creates the `users` table. Run it once
-  against your database (Supabase SQL editor, or `psql "$DATABASE_URL" -f
-  db/migrations/001_users.sql`) before signup will work.
+- `src/lib/supabase.ts` — lazy Supabase client (`@supabase/supabase-js`)
+  using the `service_role` key, talking to Supabase's REST API (PostgREST)
+  rather than a raw Postgres connection. Chosen over a direct `postgres`
+  wire-protocol connection because it works over plain HTTPS — no TCP
+  connection-pool exhaustion risk on serverless, and no dependency on
+  raw-Postgres-port egress being reachable.
+- `db/migrations/001_users.sql` — creates the `users` table. PostgREST
+  can't run arbitrary DDL, so this must be run once by hand: Supabase
+  dashboard → SQL Editor → paste → Run.
 - `src/lib/auth/users.ts` — bcrypt-hashed passwords, queried via the above.
 - `src/lib/auth/session.ts` — `iron-session`-backed encrypted cookie
   session. Requires a `SESSION_SECRET` env var (32+ random chars) — see
@@ -57,12 +60,13 @@ the AEGIS components above. It's wired to real (if minimal) auth:
 ## Development
 
 ```bash
-cp .env.example .env.local   # fill in SESSION_SECRET and DATABASE_URL
+cp .env.example .env.local   # fill in SESSION_SECRET and the SUPABASE_* vars
 npm run dev      # http://localhost:3000
 npm run build
 npm run lint
 ```
 
-On Vercel, set `SESSION_SECRET` and `DATABASE_URL` as project environment
-variables (Settings → Environment Variables) — the build succeeds without
-them, but auth routes need them at runtime.
+On Vercel, set `SESSION_SECRET`, `SUPABASE_URL`, and
+`SUPABASE_SERVICE_ROLE_KEY` as project environment variables (Settings →
+Environment Variables) — the build succeeds without them, but auth routes
+need them at runtime.
