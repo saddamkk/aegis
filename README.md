@@ -62,11 +62,13 @@ the AEGIS components above. It's wired to real (if minimal) auth:
 ```bash
 cp .env.example .env.local   # fill in SESSION_SECRET and the SUPABASE_* vars
 npm run dev      # http://localhost:3000
-npm run build
-npm run lint
+npm run verify   # typecheck + lint + build
 ```
 
 On Vercel, set `SESSION_SECRET`, `SUPABASE_URL`, and
 `SUPABASE_SERVICE_ROLE_KEY` as project environment variables (Settings →
 Environment Variables) — the build succeeds without them, but auth routes
 need them at runtime.
+
+See [`TEST_PLAN.md`](./TEST_PLAN.md) for the checklist of what to verify
+before/after a change — kept up to date alongside new components/routes.
