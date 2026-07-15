@@ -1,5 +1,6 @@
 import { getIronSession, type SessionOptions } from 'iron-session';
 import { cookies } from 'next/headers';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 export type SessionUser = {
   id: string;
@@ -37,4 +38,34 @@ function getSessionOptions(): SessionOptions {
 
 export async function getSession() {
   return getIronSession<SessionData>(await cookies(), getSessionOptions());
+}
+
+/**
+ * Like getSession(), but re-checks the user's `blocked` status against the
+ * database on every call rather than trusting the (otherwise stateless)
+ * cookie. A blocked user's session is destroyed the next time they hit a
+ * route that calls this — not the instant they're blocked (no push
+ * mechanism exists), but before they can do anything else authenticated.
+ * Use this for any protected route; use getSession() for the auth mutation
+ * routes themselves (login/signup/logout), which don't need the extra
+ * lookup.
+ */
+export async function getActiveSession() {
+  const session = await getSession();
+
+  if (session.user) {
+    const supabase = getSupabaseAdmin();
+    const { data } = await supabase
+      .from('users')
+      .select('blocked')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    if (!data || data.blocked) {
+      session.destroy();
+      session.user = undefined;
+    }
+  }
+
+  return session;
 }

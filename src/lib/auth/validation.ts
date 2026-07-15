@@ -11,7 +11,7 @@ export type LoginInput = {
   password: string;
 };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateSignup(input: SignupInput): Partial<Record<keyof SignupInput, string>> {
   const errors: Partial<Record<keyof SignupInput, string>> = {};

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run lint && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run build",
+    "seed:admin": "node --env-file=.env.local scripts/seed-master-admin.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.1",

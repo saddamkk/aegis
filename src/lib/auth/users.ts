@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import { DUMMY_HASH, comparePassword, hashPassword } from '@/lib/hash';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import type { SessionUser } from './session';
 
@@ -21,7 +21,7 @@ export async function createUser(input: {
     throw new AuthError('An account with this email already exists.');
   }
 
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await hashPassword(input.password);
 
   const { data: user, error } = await supabase
     .from('users')
@@ -48,17 +48,24 @@ export async function verifyUser(email: string, password: string): Promise<Sessi
   const supabase = getSupabaseAdmin();
   const { data: user } = await supabase
     .from('users')
-    .select('id, email, name, org, password_hash')
+    .select('id, email, name, org, password_hash, blocked')
     .eq('email', email.trim().toLowerCase())
     .maybeSingle();
 
   // Compare against a dummy hash when the user doesn't exist, so a missing
   // account and a wrong password take the same amount of time to reject.
-  const hash = user?.password_hash ?? '$2b$10$CwTycUXWue0Thq9StjUM0uJ8Ry8xIw5MdQqfmH4hSyF9v9J2RIB2u';
-  const valid = await bcrypt.compare(password, hash);
+  const valid = await comparePassword(password, user?.password_hash ?? DUMMY_HASH);
 
   if (!user || !valid) {
     throw new AuthError('Invalid email or password.');
+  }
+
+  // Deliberately a distinct message, not the generic one above -- a
+  // suspended user needs to know to contact support, which is worth the
+  // (small, already-authenticated-with-correct-password) information
+  // disclosure that the account exists.
+  if (user.blocked) {
+    throw new AuthError('This account has been suspended.');
   }
 
   return { id: user.id, email: user.email, name: user.name, org: user.org };

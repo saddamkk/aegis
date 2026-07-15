@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth/session';
+import { getActiveSession } from '@/lib/auth/session';
 import { LogoutButton } from './LogoutButton';
 
 export default async function DashboardPage() {
-  const session = await getSession();
+  const session = await getActiveSession();
   if (!session.user) {
     redirect('/login');
   }

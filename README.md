@@ -55,20 +55,54 @@ the AEGIS components above. It's wired to real (if minimal) auth:
   so a missing env var doesn't crash the Next.js build.
 - `src/app/api/auth/{signup,login,logout,session}/route.ts` — API routes.
 - `/dashboard` — a minimal protected page (server-side redirect to
-  `/login` if unauthenticated) demonstrating the gated destination.
+  `/login` if unauthenticated) demonstrating the gated destination. Uses
+  `getActiveSession()`, which re-checks `blocked` status against the
+  database on every load — a blocked user's session dies the next time
+  they hit a protected route, not the instant they're blocked (no push
+  mechanism exists).
+
+## Admin panel
+
+`/admin/*` is a **completely separate system** from the public user auth
+above — its own `admins` table, its own session cookie
+(`aegis_admin_session`, `ADMIN_SESSION_SECRET`), its own login page
+(`/admin/login`, no public sign-up). A bug in the public signup/login flow
+can't grant admin access, by construction.
+
+- **Roles**: `master_admin` and `admin`. Only `master_admin` can add other
+  admins (`/admin/admins` — gated both in the page itself and in the
+  `POST /api/admin/admins` route via `requireMasterAdmin()`, so the UI gate
+  isn't the only thing standing between a regular admin and that endpoint).
+- **Bootstrapping**: nothing public can ever create the first master admin.
+  Run `npm run seed:admin` (reads `MASTER_ADMIN_EMAIL` /
+  `MASTER_ADMIN_PASSWORD`, idempotent) after running the migrations below.
+- **Subscription packages** (`/admin/packages`): structure only, per the
+  original ask — `name`, `tier` (free-form text, not a locked enum; loose
+  convention so far is `free` / `advanced`), `price_cents`, `description`,
+  `is_active`. Tier specifics aren't decided yet; expect this to change.
+- **Platform users** (`/admin/users`): lists `id`, signup date, org,
+  subscription package, and blocked status — **no email or name is ever
+  queried or displayed**, by design. Admins can block/unblock; blocking
+  also kills the user's active session (see `getActiveSession()` above) and
+  rejects any future login attempt with a distinct "account suspended"
+  message.
+- `db/migrations/002_admin.sql` — creates `admins` and
+  `subscription_packages`, adds `blocked` and `subscription_package_id` to
+  `users`. Run after `001_users.sql`.
 
 ## Development
 
 ```bash
-cp .env.example .env.local   # fill in SESSION_SECRET and the SUPABASE_* vars
+cp .env.example .env.local   # fill in the session secrets and SUPABASE_* vars
 npm run dev      # http://localhost:3000
 npm run verify   # typecheck + lint + build
 ```
 
-On Vercel, set `SESSION_SECRET`, `SUPABASE_URL`, and
+On Vercel, set `SESSION_SECRET`, `ADMIN_SESSION_SECRET`, `SUPABASE_URL`, and
 `SUPABASE_SERVICE_ROLE_KEY` as project environment variables (Settings →
 Environment Variables) — the build succeeds without them, but auth routes
-need them at runtime.
+need them at runtime. `MASTER_ADMIN_EMAIL` / `MASTER_ADMIN_PASSWORD` are
+only needed locally/once when running `npm run seed:admin`.
 
 See [`TEST_PLAN.md`](./TEST_PLAN.md) for the checklist of what to verify
 before/after a change — kept up to date alongside new components/routes.
